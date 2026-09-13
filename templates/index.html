@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HeartPredict | Clinical screening</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <style>
+    .result-actions,.form-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}
+    .result-panel{align-items:stretch;display:grid;grid-template-columns:minmax(260px,1fr) minmax(330px,1.2fr);gap:34px}.result-score-row{align-items:center;display:flex;gap:22px;margin-top:28px}.performance{background:rgba(7,26,29,.28);border:1px solid rgba(158,225,207,.2);border-radius:10px;padding:20px}.performance-heading{align-items:center;display:flex;justify-content:space-between;margin-bottom:18px}.performance-heading h3{font-family:'Space Grotesk';font-size:15px;margin:0}.performance-heading span{color:var(--muted);font-size:10px}.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.metric-grid div{border-left:2px solid var(--mint);padding-left:9px}.metric-grid b{display:block;font:600 18px 'Space Grotesk'}.metric-grid small{color:var(--muted);font-size:9px}.metric-chart{border-top:1px solid var(--line);margin-top:18px;padding-top:15px}.chart-row{align-items:center;display:grid;grid-template-columns:74px 1fr;gap:9px;margin:9px 0}.chart-row span{color:var(--muted);font-size:10px}.chart-row i{background:rgba(255,255,255,.12);border-radius:8px;height:7px;overflow:hidden}.chart-row em{background:linear-gradient(90deg,var(--mint),#61b8e4);border-radius:8px;display:block;height:100%;transition:width .7s ease;width:0}.higher-risk .performance{border-color:rgba(255,152,127,.3)}@media(max-width:760px){.result-panel{display:block}.performance{margin-top:28px}.result-score-row{justify-content:space-between}.metric-grid{grid-template-columns:repeat(2,1fr);gap:15px}}
+    .loss-row em{background:linear-gradient(90deg,var(--coral),#e4c06d)}
+    .evidence{border-top:1px solid var(--line);margin-top:27px;padding-top:20px}.evidence h3{font:600 15px 'Space Grotesk';margin:0 0 5px}.evidence>p{color:var(--muted);font-size:11px;margin:0 0 13px}.evidence ul{list-style:none;margin:0;padding:0}.evidence li{align-items:center;display:grid;gap:10px;grid-template-columns:145px 1fr 38px;margin:9px 0}.evidence li span{font-size:11px}.evidence li small{color:var(--muted);display:block;font-size:10px;margin-top:2px}.evidence li i{background:rgba(255,255,255,.12);border-radius:6px;height:5px;overflow:hidden}.evidence li i em{background:var(--coral);border-radius:6px;display:block;height:100%}.evidence li b{color:var(--mint);font-size:10px;text-align:right}
+      .class-breakdown{border-top:1px solid var(--line);margin-top:20px;padding-top:16px}
+      .class-breakdown h3{font:600 13px 'Space Grotesk';margin:0 0 10px}
+      .class-probability{align-items:center;display:grid;gap:9px;grid-template-columns:150px 1fr 38px;margin:7px 0}
+      .class-probability span,.class-probability b{font-size:10px}
+      .class-probability i{background:rgba(255,255,255,.12);border-radius:6px;height:5px;overflow:hidden}
+      .class-probability em{background:linear-gradient(90deg,#69c8ec,var(--mint));border-radius:6px;display:block;height:100%}
+      .class-probability b{color:var(--mint);text-align:right}
+  </style>
+</head>
+<body>
+  <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
+  <header class="topbar">
+    <a class="brand" href="/"><span class="brand-mark">+</span> Heart<span>Predict</span></a>
+    <nav><a href="/">Home</a><a href="/dashboard">Dashboard</a><a class="active" href="/predict">Predict</a><a href="#how-it-works">About</a><a id="authNavLink" href="/login">Login</a></nav>
+    <button class="icon-button" aria-label="Toggle theme" id="themeToggle">◐</button>
+  </header>
+  <main>
+    <section class="hero" id="screening">
+      <div class="hero-copy"><p class="eyebrow"><span></span> CLINICAL SCREENING TOOL</p><h1>A clearer signal<br><em>for your heart.</em></h1><p class="intro">A thoughtful, data-informed screening experience designed to help you understand cardiovascular risk factors earlier.</p><div class="hero-meta"><div class="pulse-line"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span>Private by design · No data stored</span></div></div>
+      <div class="heart-orbit" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="heart-symbol">♥</div><div class="orbit-dot dot-one"></div><div class="orbit-dot dot-two"></div></div>
+    </section>
+    <section class="workspace">
+      <div class="section-heading"><div><p class="eyebrow">01 / PATIENT PROFILE</p><h2>Tell us about the patient</h2></div><span class="step">STEP 1 OF 1</span></div>
+      <form id="predictionForm">
+        <div class="form-grid">
+          <div class="field-group"><label for="age">Age <small>18-90 years</small></label><input id="age" name="age" type="number" min="18" max="90" placeholder="18-90" required></div>
+          <div class="field-group"><label for="sex">Sex</label><select id="sex" name="sex"><option>Male</option><option>Female</option></select></div>
+          <div class="field-group"><label for="systolic_bp">Systolic BP <small>90-200 mmHg</small></label><input id="systolic_bp" name="systolic_bp" type="number" min="90" max="200" placeholder="90-200" required></div>
+          <div class="field-group"><label for="diastolic_bp">Diastolic BP <small>60-130 mmHg</small></label><input id="diastolic_bp" name="diastolic_bp" type="number" min="60" max="130" placeholder="60-130" required></div>
+          <div class="field-group"><label for="resting_heart_rate">Resting heart rate <small>40-160 bpm</small></label><input id="resting_heart_rate" name="resting_heart_rate" type="number" min="40" max="160" placeholder="40-160" required></div>
+          <div class="field-group"><label for="body_temperature">Body temperature <small>96.8-105 °F</small></label><input id="body_temperature" name="body_temperature" type="number" min="96.8" max="105" step="0.1" placeholder="96.8-105" required></div>
+          <div class="field-group"><label for="total_cholesterol">Total cholesterol <small>103.4-349.7</small></label><input id="total_cholesterol" name="total_cholesterol" type="number" min="103.4" max="349.7" step="0.1" placeholder="103.4-349.7" required></div>
+          <div class="field-group"><label for="ldl_cholesterol">LDL cholesterol <small>40-242</small></label><input id="ldl_cholesterol" name="ldl_cholesterol" type="number" min="40" max="242" step="0.1" placeholder="40-242" required></div>
+          <div class="field-group"><label for="hdl_cholesterol">HDL cholesterol <small>20-100</small></label><input id="hdl_cholesterol" name="hdl_cholesterol" type="number" min="20" max="100" step="0.1" placeholder="20-100" required></div>
+          <div class="field-group"><label for="blood_glucose">Blood glucose <small>60-248.2</small></label><input id="blood_glucose" name="blood_glucose" type="number" min="60" max="248.2" step="0.1" placeholder="60-248.2" required></div>
+          <div class="field-group"><label for="serum_creatinine">Serum creatinine <small>0.4-2.97</small></label><input id="serum_creatinine" name="serum_creatinine" type="number" min="0.4" max="2.97" step="0.01" placeholder="0.4-2.97" required></div>
+          <div class="field-group"><label for="crp">CRP <small>0.1-40.88 mg/L</small></label><input id="crp" name="crp" type="number" min="0.1" max="40.88" step="0.01" placeholder="0.1-40.88" required></div>
+          <div class="field-group"><label for="wbc_count">WBC count <small>3-20</small></label><input id="wbc_count" name="wbc_count" type="number" min="3" max="20" step="0.1" placeholder="3-20" required></div>
+          <div class="field-group"><label for="pr_interval">PR interval <small>180-300 ms</small></label><input id="pr_interval" name="pr_interval" type="number" min="180" max="300" placeholder="180-300" required></div>
+          <div class="field-group"><label for="qt_interval">QT interval <small>280-550 ms</small></label><input id="qt_interval" name="qt_interval" type="number" min="280" max="550" placeholder="280-550" required></div>
+          <div class="field-group"><label for="qtc_interval">QTc interval <small>300-580 ms</small></label><input id="qtc_interval" name="qtc_interval" type="number" min="300" max="580" placeholder="300-580" required></div>
+          <div class="field-group"><label for="heart_axis">Heart axis <small>-90 to 180°</small></label><input id="heart_axis" name="heart_axis" type="number" min="-90" max="180" placeholder="-90-180" required></div>
+          <div class="field-group"><label for="ejection_fraction">Ejection fraction <small>15-80%</small></label><input id="ejection_fraction" name="ejection_fraction" type="number" min="15" max="80" placeholder="15-80" required></div>
+          <div class="field-group"><label for="ea_ratio">E/A ratio <small>0.3-2.08</small></label><input id="ea_ratio" name="ea_ratio" type="number" min="0.3" max="2.08" step="0.01" placeholder="0.3-2.08" required></div>
+          <div class="field-group"><label for="wmsi">WMSI <small>1-2.67</small></label><input id="wmsi" name="wmsi" type="number" min="1" max="2.67" step="0.01" placeholder="1-2.67" required></div>
+          <div class="field-group"><label for="bmi">BMI <small>15-49.7 kg/m²</small></label><input id="bmi" name="bmi" type="number" min="15" max="49.7" step="0.1" placeholder="15-49.7" required></div>
+          <div class="field-group"><label for="smoking_cigarettes">Smoking <small>0-30/day</small></label><input id="smoking_cigarettes" name="smoking_cigarettes" type="number" min="0" max="30" placeholder="0-30" required></div>
+          <div class="field-group"><label for="alcohol_ml">Alcohol <small>0-300 ml/day</small></label><input id="alcohol_ml" name="alcohol_ml" type="number" min="0" max="300" placeholder="0-300" required></div>
+          <div class="field-group"><label for="parent_disease">Parent disease history</label><select id="parent_disease" name="parent_disease"><option>None</option><option>Yes</option></select></div>
+        </div>
+        <div class="form-footer"><p><span class="lock">⌑</span> Your entries are processed locally for this session.</p><div class="form-actions"><button type="button" class="secondary-button" id="autofillButton">Auto-fill demo values</button><button type="submit" class="primary-button">Analyze risk <span>↗</span></button></div></div>
+      </form>
+    </section>
+    <section class="result-panel" id="resultPanel" hidden><div class="result-copy"><p class="eyebrow">SCREENING RESULT / INTERMEDIATE OUTPUT</p><h2 id="resultTitle">Your result is ready.</h2><p id="resultMessage"></p><div class="evidence"><h3>What influenced this class</h3><p>Highest-weight attributes in the trained model:</p><ul id="evidenceList"></ul></div><div class="result-score-row"><div class="score"><strong id="probability">--</strong><span>estimated risk<br>probability</span></div><div class="result-actions"><button class="secondary-button" id="printButton" type="button">Print result</button><button class="secondary-button" id="resetButton" type="button">Start over ↗</button></div></div></div><div class="performance"><div class="performance-heading"><h3>Performance analysis</h3><span>held-out test set</span></div><div class="metric-grid"><div><b id="accuracyMetric">--</b><small>Accuracy</small></div><div><b id="precisionMetric">--</b><small>Precision</small></div><div><b id="f1Metric">--</b><small>F1-score</small></div><div><b id="lossMetric">--</b><small>Log loss</small></div></div><div class="metric-chart" aria-label="Accuracy precision recall F1-score and loss graph"><div class="chart-row"><span>Accuracy</span><i><em id="accuracyBar"></em></i></div><div class="chart-row"><span>Precision</span><i><em id="precisionBar"></em></i></div><div class="chart-row"><span>Recall</span><i><em id="recallBar"></em></i></div><div class="chart-row"><span>F1-score</span><i><em id="f1Bar"></em></i></div><div class="chart-row loss-row"><span>Log loss</span><i><em id="lossBar"></em></i></div></div></div></section>
+    <section class="how" id="how-it-works"><div class="section-heading"><div><p class="eyebrow">02 / A GENTLE GUIDE</p><h2>From inputs to insight</h2></div></div><div class="how-grid"><article><span>01</span><h3>Complete the profile</h3><p>Use recent clinical readings for a more useful screening signal.</p></article><article><span>02</span><h3>Model reads the pattern</h3><p>A trained ensemble weighs the attributes together, not in isolation.</p></article><article><span>03</span><h3>Discuss the result</h3><p>Use the result as a prompt for a conversation with a qualified clinician.</p></article></div></section>
+  </main>
+  <footer id="about"><span>HeartPredict / 2026</span><span>For educational screening support only. Not medical advice.</span></footer>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
