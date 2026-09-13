@@ -8,6 +8,15 @@ const printButton = document.querySelector('#printButton');
 const autofillButton = document.querySelector('#autofillButton');
 const themeToggle = document.querySelector('#themeToggle');
 const authNavLink = document.querySelector('#authNavLink');
+const readStoredJson = (key, fallback) => {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : fallback;
+  } catch (error) {
+    localStorage.removeItem(key);
+    return fallback;
+  }
+};
 if (authNavLink && localStorage.getItem('heartpredict_session') === 'true') {
   authNavLink.href = '/login';
   authNavLink.textContent = 'Logout';
@@ -47,7 +56,13 @@ form.addEventListener('submit', async (event) => {
   const payload = Object.fromEntries(new FormData(form).entries());
   try {
     const response = await fetch('/api/predict', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-    const result = await response.json();
+    const responseText = await response.text();
+    let result;
+    try {
+      result = responseText ? JSON.parse(responseText) : {};
+    } catch (error) {
+      throw new Error(`The server returned an invalid response (${response.status}).`);
+    }
     if (!response.ok) throw new Error(result.error || 'Unable to analyze this profile.');
     const isHigher = result.risk === 'higher';
     resultPanel.hidden = false;
@@ -78,9 +93,9 @@ form.addEventListener('submit', async (event) => {
     setBar('recallBar', metrics.recall);
     setBar('f1Bar', metrics.f1);
     setBar('lossBar', metrics.loss);
-    const currentUser = JSON.parse(localStorage.getItem('heartpredict_user') || 'null');
+    const currentUser = readStoredJson('heartpredict_user', null);
     const historyKey = `heartpredict_history_${encodeURIComponent(currentUser?.email || 'guest')}`;
-    const history = JSON.parse(localStorage.getItem(historyKey) || '[]');
+    const history = readStoredJson(historyKey, []);
     history.unshift({ disease: result.disease, probability: result.probability, risk: result.risk, date: new Date().toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) });
     localStorage.setItem(historyKey, JSON.stringify(history.slice(0, 10)));
     resultPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });

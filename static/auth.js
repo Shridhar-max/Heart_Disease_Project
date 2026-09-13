@@ -2,7 +2,16 @@ const userKey = 'heartpredict_user';
 const sessionKey = 'heartpredict_session';
 const historyKey = 'heartpredict_history';
 const noticeKey = 'heartpredict_auth_notice';
-const getUser = () => JSON.parse(localStorage.getItem(userKey) || 'null');
+const readStoredJson = (key, fallback) => {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : fallback;
+  } catch (error) {
+    localStorage.removeItem(key);
+    return fallback;
+  }
+};
+const getUser = () => readStoredJson(userKey, null);
 const getHistoryKey = () => `${historyKey}_${encodeURIComponent(getUser()?.email || 'guest')}`;
 
 const validatePassword = (password) => {
@@ -98,7 +107,7 @@ if (userName) {
 const historyRows = document.querySelector('#historyRows');
 if (historyRows) {
   const scopedHistoryKey = getHistoryKey();
-  const history = JSON.parse(localStorage.getItem(scopedHistoryKey) || '[]');
+  const history = readStoredJson(scopedHistoryKey, []);
   document.querySelector('#screeningCount').textContent = history.length;
   if (history.length) {
     const latest = history[0];
