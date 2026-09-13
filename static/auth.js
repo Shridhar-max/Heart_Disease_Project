@@ -5,15 +5,58 @@ const noticeKey = 'heartpredict_auth_notice';
 const getUser = () => JSON.parse(localStorage.getItem(userKey) || 'null');
 const getHistoryKey = () => `${historyKey}_${encodeURIComponent(getUser()?.email || 'guest')}`;
 
+const validatePassword = (password) => {
+  const checks = [
+    password.length >= 8,
+    /[a-z]/.test(password),
+    /[A-Z]/.test(password),
+    /\d/.test(password),
+    /[^A-Za-z0-9]/.test(password)
+  ];
+  return checks.every(Boolean);
+};
+
+const updatePasswordRules = (password) => {
+  const rules = document.querySelectorAll('.password-rule');
+  const checks = [
+    password.length >= 8,
+    /[a-z]/.test(password),
+    /[A-Z]/.test(password),
+    /\d/.test(password),
+    /[^A-Za-z0-9]/.test(password)
+  ];
+
+  rules.forEach((rule, index) => {
+    const isValid = checks[index];
+    rule.classList.toggle('valid', isValid);
+    rule.textContent = index === 0 ? '8+ characters' : index === 1 ? 'Lowercase' : index === 2 ? 'Uppercase' : index === 3 ? 'Number' : 'Symbol';
+  });
+};
+
+const passwordInput = document.querySelector('#passwordInput');
+if (passwordInput) {
+  passwordInput.addEventListener('input', (event) => {
+    updatePasswordRules(event.target.value);
+  });
+}
+
 const registerForm = document.querySelector('#registerForm');
 if (registerForm) registerForm.addEventListener('submit', (event) => {
   event.preventDefault();
   const data = Object.fromEntries(new FormData(registerForm).entries());
+  const passwordError = document.querySelector('#registerError');
   const existing = getUser();
-  if (existing?.email === data.email) {
-    document.querySelector('#registerError').textContent = 'An account with this email already exists. Please login.';
+
+  if (!validatePassword(data.password)) {
+    passwordError.textContent = 'Password must be at least 8 characters and include uppercase, lowercase, a number, and a symbol.';
     return;
   }
+
+  if (existing?.email === data.email) {
+    passwordError.textContent = 'An account with this email already exists. Please login.';
+    return;
+  }
+
   localStorage.setItem(userKey, JSON.stringify({name: data.name, email: data.email, password: data.password}));
   localStorage.removeItem(sessionKey);
   localStorage.setItem(noticeKey, 'Registration successful. Please login to continue.');

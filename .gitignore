@@ -1,4 +1,7 @@
-.venv/
 __pycache__/
-models/
 *.pyc
+.venv/
+venv/
+.env
+.vscode/
+.DS_Store
