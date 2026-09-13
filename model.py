@@ -48,7 +48,7 @@ DISPLAY_NAMES = {
 def _make_pipeline():
     ensemble = VotingClassifier(
         estimators=[
-            ("trees", ExtraTreesClassifier(n_estimators=500, min_samples_leaf=2, class_weight="balanced", random_state=42, n_jobs=-1)),
+            ("trees", ExtraTreesClassifier(n_estimators=80, min_samples_leaf=2, class_weight="balanced", random_state=42, n_jobs=-1)),
             ("linear", Pipeline([("scale", StandardScaler()), ("logistic", LogisticRegression(max_iter=2000, class_weight="balanced"))])),
         ],
         voting="soft",
@@ -118,7 +118,7 @@ def train_model(csv_path="data/heart_disease.csv"):
         total = float(absolute.sum()) or 1.0
         class_feature_importance[str(int(class_id))] = {name: round(float(value / total), 4) for name, value in zip(x.columns, absolute)}
     MODEL_PATH.parent.mkdir(exist_ok=True)
-    joblib.dump({"pipeline": pipeline, "metrics": metrics, "class_metrics": class_metrics, "feature_names": list(x.columns, ), "label_names": label_names, "feature_importance": feature_importance, "class_feature_importance": class_feature_importance}, MODEL_PATH)
+    joblib.dump({"pipeline": pipeline, "metrics": metrics, "class_metrics": class_metrics, "feature_names": list(x.columns, ), "label_names": label_names, "feature_importance": feature_importance, "class_feature_importance": class_feature_importance}, MODEL_PATH, compress=3)
     return metrics
 
 
